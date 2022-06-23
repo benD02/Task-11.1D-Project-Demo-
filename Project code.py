@@ -1,9 +1,11 @@
 #NOTE: The "Check" prints are scattered through the code for debugging, they should all
 # run if the code is working 
 
-#Libraries to import 
+#Libraries to import
+import smbus
 import sys
-import requests 
+import requests
+from smbus import SMBus
 from gpiozero import MotionSensor, LED
 from picamera import PiCamera 
 from signal import pause 
@@ -17,8 +19,8 @@ camera = PiCamera()
 print("Check2")
 TestLED = LED(17)
 camera.resolution = (1920, 1080)
-
-
+addr = 0x8
+bus = SMBus(1)
 ##GUI DEFINITIONS
 app = App()
 
@@ -37,6 +39,9 @@ def send_alert():
            
 #Function to arm the system and allow the device to start taking captures         
 def ArmSystem():
+    bus.write_byte(addr, 0x1)
+    sleep(100)
+    bus.write_byte(addr, 0x0)
     valid = True
     TestLED.on()
     while valid == True: #Runs code continuously while system is armed, only stops code if system has been disarmed
